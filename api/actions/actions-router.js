@@ -47,21 +47,17 @@ router.post('/', checkNewAction, (req, res) => {
     })
 
 
-router.put('/:id', (req, res) => {
+router.put('/:id', checkNewAction, (req, res) => {
     Actions.update(req.params.id, req.body)
     .then(action => {
-        if(!action.project_id || !action.description || !action.notes){
-            res.status(400).json({message: 'please include project id, description and notes'})
-        }else{
         res.status(200).json(action)
-        }
-    })
+        })
     .catch(err => {
         res.status(500).json({
             message: 'error updating action'
         })
     })
-})
+    })
 
 router.delete('/:id', (req, res) => {
     Actions.remove(req.params.id)

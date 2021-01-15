@@ -57,15 +57,11 @@ router.post('/', checkNewProject, (req, res) => {
     })
 })
 
-router.put('/:id', (req, res) => {
+router.put('/:id', checkNewProject, (req, res) => {
     Projects.update(req.params.id, req.body)
     .then(project=> {
-        if(!project.name|| !project.description){
-            res.status(400).json({message: 'please include project name & description'})
-        }else{
         res.status(200).json(project)
-        }
-    })
+        })
     .catch(err => {
         res.status(500).json({
             message: 'error updating project'
