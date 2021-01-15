@@ -2,7 +2,7 @@
 const Projects = require('./projects-model')
 const express = require('express');
 const router = (express.Router())
-
+const{ checkNewProject } =require('../middleware/index')
 router.get('/', async (req, res, next) => {
     Projects.get()
     .then(projects => {
@@ -36,7 +36,7 @@ router.get('/:id/actions', (req, res) => {
     Projects.get(req.params.id)
     .then(project => {
         if (project){
-            res.status(200).json(project)
+            res.status(200).json(project.actions)
         }else{
             res.status(404).json([])
         }
@@ -47,15 +47,11 @@ router.get('/:id/actions', (req, res) => {
 })
 
 
-router.post('/', (req, res) => {
+router.post('/', checkNewProject, (req, res) => {
     Projects.insert(req.body)
     .then(newProject=> {
-        if(!newProject.name || !newProject.description){
-            res.status(400).json({message: 'please include an name & description'})
-        }else{
             res.status(202).json(newProject)
-        }
-    })
+        })
     .catch(error => {
         res.status(500).json({message: 'there was an error while trying to create new project'})
     })
@@ -81,7 +77,7 @@ router.delete('/:id', (req, res) => {
     Projects.remove(req.params.id)
     .then(project=> {
         if (!project){
-            res.status(400).json({message: 'The project with this id does not exist'})
+            res.status(404).json({message: 'The project with this id does not exist'})
         }else{
             res.status(200).json({message: 'project successfully deleted'})
         }

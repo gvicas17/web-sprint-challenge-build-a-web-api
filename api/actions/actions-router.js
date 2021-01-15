@@ -2,6 +2,7 @@
 const Actions = require('./actions-model')
 const express = require('express');
 const router = express.Router()
+const {checkNewAction} = require('../middleware/index')
 
 
 router.get('/', async (req, res, next) => {
@@ -35,19 +36,16 @@ router.get('/:id', (req, res) => {
 
 
 
-router.post('/', (req, res) => {
+router.post('/', checkNewAction, (req, res) => {
     Actions.insert(req.body)
     .then(newAction => {
-        if(!newAction.project_id || !newAction.description || !newAction.notes){
-            res.status(400).json({message: 'please include an id, description, and notes'})
-        }else{
-            res.status(202).json(newAction)
-        }
+            res.status(201).json(newAction)
+        })
+        .catch(err => {
+            res.json(500).json(err)
+        })
     })
-    .catch(error => {
-        res.status(500).json({message: 'there was an error while trying to create new action'})
-    })
-})
+
 
 router.put('/:id', (req, res) => {
     Actions.update(req.params.id, req.body)
