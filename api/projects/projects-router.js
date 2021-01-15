@@ -1,17 +1,21 @@
 // Write your "projects" router here!
 const Projects = require('./projects-model')
-const express = require('express')
+const express = require('express');
 const router = (express.Router())
 
-router.get('/', (req, res) => {
-    Projects.get(req.query)
-    .then(project => {
-        res.status(200).json(project)
+router.get('/', async (req, res, next) => {
+    Projects.get()
+    .then(projects => {
+        if(projects){
+            res.status(200).json(projects)
+        }else{
+            res.status(400).json([])
+        }
     })
-    .catch(err => {
-        res.status(500).json(err)
+    .catch(err =>{
+        next(err)
     })
-})
+  });
 
 
 router.get('/:id', (req, res) => {
@@ -27,6 +31,21 @@ router.get('/:id', (req, res) => {
         res.status(500).json({message: 'error retrieving the project'})
     })
 })
+
+router.get('/:id/actions', (req, res) => {
+    Projects.get(req.params.id)
+    .then(project => {
+        if (project){
+            res.status(200).json(project)
+        }else{
+            res.status(404).json([])
+        }
+    })
+    .catch(err => {
+        res.status(500).json({message: 'error retrieving the project'})
+    })
+})
+
 
 router.post('/', (req, res) => {
     Projects.insert(req.body)

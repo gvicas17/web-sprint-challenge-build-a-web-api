@@ -1,18 +1,20 @@
 // Write your "actions" router here!
 const Actions = require('./actions-model')
 const express = require('express');
-const e = require('express');
 const router = express.Router()
 
 
-router.get('/', (req, res) => {
-    Actions.get(req.query)
+router.get('/', async (req, res, next) => {
+    Actions.get()
     .then(actions => {
         if(actions){
             res.status(200).json(actions)
         }else{
             res.status(400).json([])
         }
+    })
+    .catch(err => {
+        next(err)
     })
   });
 
@@ -30,6 +32,8 @@ router.get('/:id', (req, res) => {
         res.status(500).json({message: 'error retrieving the action'})
     })
 })
+
+
 
 router.post('/', (req, res) => {
     Actions.insert(req.body)
